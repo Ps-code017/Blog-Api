@@ -10,8 +10,10 @@ app.use(cookieParser())
 
 //import routes
 import authRouter from "./routes/auth.routes.js"
+import welcomeRouter from "./routes/welcome.route.js"
 
 //give path to routes app.use('/api/home',homerouter)
 app.use("/api/auth",authRouter)
+app.use("/api/welcome",welcomeRouter)
 
 export {app};

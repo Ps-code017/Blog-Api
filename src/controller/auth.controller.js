@@ -104,13 +104,22 @@ const googleCallbackController=asyncHandler(async(req,res)=>{
     const code=req.query.code
     if (!code) throw new ApiError(400, "Authorization code missing");
 
-    const tokenRes = await axios.post("https://oauth2.googleapis.com/token", {
-    code,
-    client_id: process.env.GOOGLE_CLIENT_ID,
-    client_secret: process.env.GOOGLE_CLIENT_SECRET,
-    redirect_uri: process.env.GOOGLE_REDIRECT_URI,
-    grant_type: "authorization_code"
-  });
+    let tokenRes
+
+    try {
+        tokenRes = await axios.post("https://oauth2.googleapis.com/token", {
+        code,
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+        grant_type: "authorization_code"
+        });
+    } catch (err) {
+        console.error("Google Token Error:", err?.response?.data || err.message);
+        throw new ApiError(500, "Token exchange failed");
+        
+    }
+  console.log("after");
 
   const idToken=tokenRes.data.id_token
 
@@ -133,13 +142,20 @@ const googleCallbackController=asyncHandler(async(req,res)=>{
     const accessToken=user.generateAccessToken()
     const refreshToken=user.generateRefreshToken()
     user.refreshToken=refreshToken
+
+
+    // console.log(refreshToken)
+
+
     let loggedInUser=await User.findById(user._id).select("-googleId -refreshToken")
     await user.save();
-     return res
-            .status(200)  
-            .cookie("accessToken", accessToken, options_access)
-            .cookie("refreshToken", refreshToken, options)
-            .json({ accessToken, refreshToken, user: loggedInUser });
+    //  return res
+    //         .status(200)  
+    res.cookie("accessToken", accessToken, options_access)
+    res.cookie("refreshToken", refreshToken, options)
+    //         .json({ accessToken, refreshToken, user: loggedInUser });
+
+    res.redirect(process.env.FRONTEND_REDIRECT_URI)
 })
 
 

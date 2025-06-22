@@ -4,8 +4,8 @@ import { ApiError } from "../utils/apiError.js";
 import { User } from "../models/user.model.js";
 
 
-const verifyjwt=asyncHandler(async(req,res)=>{
-    const accessToken=req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ","");
+const verifyjwt=asyncHandler(async(req,_,next)=>{
+    const accessToken=req.cookies?.accessToken 
     if(!accessToken){
         throw new ApiError(400,"unauthorized request");
     }
@@ -15,9 +15,10 @@ const verifyjwt=asyncHandler(async(req,res)=>{
     }catch{
         throw new ApiError(400,"token not match")
     }
+    console.log(decoded_token)
     const user=await User.findOne({
             _id:decoded_token?._id,
-            googleId:decoded_token?.gid
+            googleId:decoded_token?.googleId
         }).select("-googleId -refreshToken")
         if(!user){
             throw new ApiError(401,"invalid token")
