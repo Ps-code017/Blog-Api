@@ -167,7 +167,7 @@ const logoutUser=asyncHandler(async(req,res)=>{
         },
         {new:true}
     )
-    return res.status(200).clearcookie("accessToken",options_access).clearcookie("refreshToken",options).json(new ApiResponse(200,"user logged out"))
+    return res.status(200).clearCookie("accessToken",options_access).clearCookie("refreshToken",options).json(new ApiResponse(200,"user logged out"))
 })
 
 export{

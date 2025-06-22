@@ -5,7 +5,7 @@ import { User } from "../models/user.model.js";
 
 
 const verifyjwt=asyncHandler(async(req,_,next)=>{
-    const accessToken=req.cookies?.accessToken 
+    const accessToken=req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ","")
     if(!accessToken){
         throw new ApiError(400,"unauthorized request");
     }
@@ -15,7 +15,7 @@ const verifyjwt=asyncHandler(async(req,_,next)=>{
     }catch{
         throw new ApiError(400,"token not match")
     }
-    console.log(decoded_token)
+    // console.log(decoded_token)
     const user=await User.findOne({
             _id:decoded_token?._id,
             googleId:decoded_token?.googleId
