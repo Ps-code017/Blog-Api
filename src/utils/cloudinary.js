@@ -12,7 +12,7 @@ const uploadOnCloundinary=async(localFilePath)=>{
     try {
         if(!localFilePath) return null;
         const response=await v2.uploader.upload(localFilePath,{resource_type:"auto"});
-        console.log("file uploaded succesfully",response.url);
+        // console.log("file uploaded succesfully",response.url);
         return response;
     } catch (err) {
         fs.unlinkSync(localFilePath)   
