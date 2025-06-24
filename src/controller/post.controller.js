@@ -136,10 +136,35 @@ const updatePostBySlug = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Post updated successfully", { post: updatedPost }));
 });
 
+const deletePost=asyncHandler(async(req,res)=>{
+  const slug=req.params.slug
+  if(!slug){
+    throw new ApiError(400,"provide slug");
+  }
+  const existedPost=await Post.findOneAndDelete({slug})
+  if(!existedPost){
+    throw new ApiError(400,"slug incorrect")
+  }
+  const image_url=existedPost.image;
+  const public_id=existedPost.public_id
+  if(image_url && public_id){
+    try {
+      await deleteFromCloudinary(public_id)
+    } catch (err) {
+      throw new ApiError(500,`err while deleting cloudinary ${err.message}`)
+      
+    }
+  }
+
+  return res.status(200).json(new ApiResponse(200,"post deleted"))
+                                            
+})
+
 
 export{
     createPost,
     getAllPosts,
     getPostBySlug,
-    updatePostBySlug
+    updatePostBySlug,
+    deletePost
 }
